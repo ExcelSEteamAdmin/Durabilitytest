@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1Ifx8OsB9iMBaC1PaI3rz5owCwIwfxT4",
+            authDomain: "durability-test.firebaseapp.com",
+            databaseURL: "https://durability-test-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "durability-test",
+            storageBucket: "durability-test.appspot.com",
+            messagingSenderId: "1015195704336",
+            appId: "1:1015195704336:web:51ec6481bea38fbaefbe95"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleSidenav = document.getElementById('toggleSidenav');
+            const sidenav = document.getElementById('sidenav-main');
+            const settingsToggle = document.querySelector('.settings-toggle');
+            const settingsModal = document.getElementById('settingsModal');
+            const closeButton = document.querySelector('.close-button');
+            const darkModeDropdown = document.getElementById('darkModeDropdown');
+            const dateFilterInput = document.getElementById('date-filter');
+
+            // Toggle Sidebar
+            toggleSidenav.addEventListener('click', () => {
+                sidenav.classList.toggle('minimized');
+            });
+
+            // Settings Modal
+            settingsToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                settingsModal.style.display = 'block';
+            });
+
+            closeButton.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === settingsModal) {
+                    settingsModal.style.display = 'none';
+                }
+            });
+
+
+            darkModeDropdown.addEventListener('change', () => {
+                if (darkModeDropdown.value === 'enabled') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            });
+
+            // Initialize DataTable
+const dataTable = $('#data-table').DataTable({
+    paging: false,
+    searching: true,  // Disable the built-in search bar
+    columnDefs: [
+        {
+            targets: 0,
+            data: null,
+            defaultContent: '<input type="checkbox" class="row-select">',
+            orderable: false
+        }
+    ]
+});
+
+
+            // Firebase data updates
+            const dataRef0 = ref(database, 'Close_Valve_0');
+            const dataRef1 = ref(database, 'Close_Valve_1');
+            const dataRef2 = ref(database, 'Close_Valve_2');
+
+            function updateTable(dataRef, indexOffset) {
+                onValue(dataRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        const currentData = Object.values(data[`Current_${indexOffset}`] || {});
+                        const cycleCountData = Object.values(data[`CycleCount_${indexOffset}`] || {});
+                        const conditionData = Object.values(data[`Condition_${indexOffset}`] || {});
+                        const currentDate = new Date().toISOString().split('T')[0];
+
+                        currentData.forEach((currentValue, index) => {
+                            const cycleCountValue = cycleCountData[index] || "N/A";
+                            const conditionValue = conditionData[index] || "N/A";
+                            const rowIndex = index;
+                            const row = dataTable.row(rowIndex);
+
+                            if (row.length) {
+                                const rowData = row.data();
+                                rowData[2 + indexOffset * 3] = currentValue || "N/A"; 
+                                rowData[3 + indexOffset * 3] = cycleCountValue;
+                                rowData[4 + indexOffset * 3] = conditionValue;
+                                rowData[11] = currentDate;
+                                dataTable.row(rowIndex).data(rowData).draw(false);
+                            } else {
+                                dataTable.row.add([
+                                    '',
+                                    `${rowIndex + 1}`,
+                                    indexOffset === 0 ? currentValue : "",
+                                    indexOffset === 0 ? cycleCountValue : "",
+                                    indexOffset === 0 ? conditionValue : "",
+                                    indexOffset === 1 ? currentValue : "",
+                                    indexOffset === 1 ? cycleCountValue : "",
+                                    indexOffset === 1 ? conditionValue : "",
+                                    indexOffset === 2 ? currentValue : "",
+                                    indexOffset === 2 ? cycleCountValue : "",
+                                    indexOffset === 2 ? conditionValue : "",
+                                    currentDate
+                                ]).draw(false);
+                            }
+                        });
+                    }
+                });
+            }
+
+            updateTable(dataRef0, 0);
+            updateTable(dataRef1, 1);
+            updateTable(dataRef2, 2);
+
+            // Export Table Data
+            document.getElementById('exportData').addEventListener('click', () => {
+                const selectedRows = [];
+                const rows = $('#data-table').DataTable().rows().nodes();
+
+                if ($('#data-table .row-select:checked').length > 0) {
+                    $('#data-table .row-select:checked').each(function () {
+                        const row = $(this).closest('tr');
+                        const rowData = dataTable.row(row).data();
+                        selectedRows.push(rowData);
+                    });
+
+                    if (selectedRows.length > 0) {
+                        const workbook = XLSX.utils.book_new();
+                        const worksheet = XLSX.utils.aoa_to_sheet([['Select', 'UID', 'Pump 1 Current', 'Pump 1 Cycle Count', 'Pump 1 Condition', 'Pump 2 Current', 'Pump 2 Cycle Count', 'Pump 2 Condition', 'Pump 3 Current', 'Pump 3 Cycle Count', 'Pump 3 Condition', 'Date']].concat(selectedRows));
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'Selected Data');
+                        XLSX.writeFile(workbook, 'selected_pump_data.xlsx');
+                    } else {
+                        alert('No rows selected.');
+                    }
+                } else {
+                    const fullTableData = dataTable.rows().data().toArray();
+                    const headers = ['Select', 'UID', 'Pump 1 Current', 'Pump 1 Cycle Count', 'Pump 1 Condition', 'Pump 2 Current', 'Pump 2 Cycle Count', 'Pump 2 Condition', 'Pump 3 Current', 'Pump 3 Cycle Count', 'Pump 3 Condition', 'Date'];
+
+                    if (fullTableData.length > 0) {
+                        const workbook = XLSX.utils.book_new();
+                        const worksheet = XLSX.utils.aoa_to_sheet([headers].concat(fullTableData));
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'Full Data');
+                        XLSX.writeFile(workbook, 'full_pump_data.xlsx');
+                    } else {
+                        alert('No data available for export.');
+                    }
+                }
+            });
+
+            // Enhanced Search Functionality
+            const searchInput = $('#search-input');
+            const searchDropdown = $('#searchDropdown');
+
+            searchInput.on('input', function () {
+                const searchValue = this.value.toLowerCase();
+                const searchType = searchDropdown.val();
+
+                dataTable.columns().search('');
+
+                if (searchType === "condition") {
+                    dataTable.columns([4, 7, 10]).search(searchValue).draw();
+                } else if (searchType === "cyclecount") {
+                    dataTable.columns([3, 6, 9]).search(searchValue).draw();
+                }
+
+                 // Apply the date filter if a date is selected
+                 if (formattedDate) {
+                    dataTable.rows().every(function () {
+                        const rowData = this.data();
+                        const pumpDate = rowData[11]; // Assuming 12th column is Date
+
+                        if (pumpDate) {
+                            const rowFormattedDate = new Date(pumpDate).toISOString().split('T')[0];
+                            if (rowFormattedDate !== formattedDate) {
+                                this.visible(false); // Hide row if the date doesn't match
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+    <aside class="sidenav" id="sidenav-main">
+        <div class="sidenav-header">
+            <a class="navbar-brand" href="#">
+                <img src="logo.png" alt="Logo">
+                <span class="brand-text">Dashboard</span>
+            </a>
+            <i class="fas fa-chevron-left" id="toggleSidenav"></i>
+        </div>
+        <hr class="horizontal dark mt-0">
+        <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="index.html">
+                        <span class="nav-link-text ms-1">Device 1</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="valveA.html">
+                        <span class="nav-link-text ms-1">Device 2</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="valveB.html">
+                        <span class="nav-link-text ms-1">Device 3</span>
+                    </a>
+                </li>
+                <li class="nav-item settings">
+                    <a class="nav-link settings-toggle" href="#">
+                        <span class="nav-link-text ms-1">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <div class="modal" id="settingsModal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Settings</h2>
+            <label for="darkModeDropdown">Dark Mode:</label>
+            <select id="darkModeDropdown">
+                <option value="disabled">Disabled</option>
+                <option value="enabled">Enabled</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div>
+            <button class="export-btn" id="exportData">Export Data</button>
+        </div>
+        <div class="filter-container">
+            <select id="searchDropdown">
+                <option value="cyclecount">Cycle Count</option>
+                <option value="condition">Condition</option>
+            </select>
+            <input type="text" id="search-input" placeholder="Search...">
+            <input type="date" id="filter-date">
+            <button class="btn-filter">Filter</button>
+        </div>
+
+        
+
+        <div class="data-table">
+            <h2>Pump</h2>
+            <table id="data-table" class="display">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>UID</th>
+                        <th>Pump 1 Current</th>
+                        <th>Pump 1 Cycle Count</th>
+                        <th>Pump 1 Condition</th>
+                        <th>Pump 2 Current</th>
+                        <th>Pump 2 Cycle Count</th>
+                        <th>Pump 2 Condition</th>
+                        <th>Pump 3 Current</th>
+                        <th>Pump 3 Cycle Count</th>
+                        <th>Pump 3 Condition</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

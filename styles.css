@@ -1,0 +1,536 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sidebar Styles */
+.sidenav {
+    background-color: #2e7d32; /* Dark green background */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.sidenav:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+.sidenav-header {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #388e3c; /* Slightly lighter green background */
+    margin-bottom: 20px;
+}
+
+.sidenav-header .navbar-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white; /* White text color */
+}
+
+.sidenav-header .navbar-brand img {
+    height: 35px;
+}
+
+.sidenav-header .navbar-brand span {
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.sidenav-header .fa-times,
+.sidenav-header .fa-chevron-left {
+    cursor: pointer;
+    color: white; /* White icons */
+    transition: color 0.3s ease;
+}
+
+.sidenav-header .fa-times:hover,
+.sidenav-header .fa-chevron-left:hover {
+    color: #c8e6c9; /* Light green on hover */
+}
+
+.navbar-nav {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.nav-item {
+    margin: 10px 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    text-decoration: none;
+    color: white; /* White text color */
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-link.active {
+    background-color: #66bb6a; /* Lighter green background for active state */
+    color: #ffffff; /* White text for active state */
+}
+
+.nav-link:hover {
+    background-color: #4caf50; /* Light green background on hover */
+    color: #ffffff; /* White text on hover */
+}
+
+.icon-shape {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #4caf50; /* Light green background */
+    margin-right: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.icon-shape svg {
+    fill: white; /* White icon color */
+    width: 16px;
+    height: 16px;
+}
+
+.icon-shape:hover {
+    background-color: #66bb6a; /* Lighter green on hover */
+}
+
+.settings {
+    margin: 10px 0;
+}
+
+.settings-link {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    text-decoration: none;
+    color: white; /* White text color */
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.settings-link {
+    background-color: #66bb6a; /* Lighter green background for active state */
+    color: #ffffff; /* White text for active state */
+}
+
+.settings-link:hover {
+    background-color: #4caf50; /* Light green background on hover */
+    color: #ffffff; /* White text on hover */
+}
+
+.sidenav-footer {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    padding: 15px;
+    background-color: #388e3c; /* Slightly lighter green background */
+    border-radius: 10px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Minimized Sidebar Styles */
+.sidenav.minimized {
+    width: 60px; /* Shrink sidebar width */
+    padding: 0;
+}
+
+.sidenav.minimized .sidenav-header {
+    justify-content: center;
+}
+
+.sidenav.minimized .navbar-brand span,
+.sidenav.minimized .nav-link-text {
+    display: none; /* Hide text when minimized */
+}
+
+.sidenav.minimized .icon-shape {
+    margin-right: 0; /* Remove margin in minimized state */
+}
+
+.sidenav.minimized .nav-link {
+    justify-content: center;
+    padding: 12px 0; /* Adjust padding for centered icons */
+}
+
+.sidenav.minimized .sidenav-footer {
+    text-align: center;
+}
+
+/* Toggle Icon Rotation */
+#toggleSidenav {
+    transition: transform 0.3s ease;
+}
+
+.sidenav.minimized #toggleSidenav {
+    transform: rotate(180deg); /* Rotate icon when sidebar is minimized */
+}
+
+/* Dashboard */
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    margin-left: 240px; /* Adjust to avoid overlap with sidebar */
+}
+
+.settings-content {
+    display: none;
+    transition: max-height 0.3s ease;
+}
+
+.settings-content.visible {
+    display: block;
+}
+
+.sidenav.minimized {
+    width: 50px; /* Adjust as needed */
+}
+
+.sidenav .settings-content {
+    padding: 10px;
+}
+
+body.dark-mode {
+    background-color: #333;
+    color: #fff;
+}
+
+body {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 30%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+}
+
+.modal-content {
+    background-color: #f4f2f2;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Could be more or less, depending on screen size */
+    height: 50%;
+    border-radius: 20px;
+}
+
+.close-button {
+    color: #000000;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#darkModeDropdown{
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    width: 40%;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.export-btn {
+    background-color: #4caf50; /* Primary button color */
+    color: #fff; /* White text color */
+    border: none;
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+    font-size: 16px; /* Adjust font size */
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    outline: none;
+    position: absolute; /* Position the button */
+    top: 20px; /* Distance from the top */
+    right: 20px; /* Distance from the right */
+}
+
+
+.export-btn:hover, .clear-btn:hover {
+    opacity: 0.9; /* Slightly transparent on hover */
+}
+
+/* Charts and Data Table */
+.data-table {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 2rem;
+    flex-direction: row;
+}
+
+.data-table {
+    margin-left: -60%;
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+
+.data-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-left: -52%;
+}
+
+.data-table h2 {
+    margin-left: 120%;
+    margin-top: -25%;
+    margin-bottom: 20%;
+}
+
+.btn-filter {
+    background-color: #4caf50; /* Green background */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-left: 10px; /* Space between button and inputs */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative; /* Set position to relative */
+    top: 30px; /* Move it 30 pixels down */
+}
+
+.btn-filter:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.data-table th, .data-table td {
+    padding: 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.data-table th {
+    background-color: #4caf50;
+    color: white;
+}
+
+/* General Styles for Filter Containers */
+.filter-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Space between filters and other elements */
+    gap: 5px; /* Space between each filter element */
+    width: 100%;
+    max-width: 600px;
+    margin-left: 100px;
+    margin-right: auto;
+    margin-top: 20px;
+    left: 200px;
+}
+
+
+/* Search Input */
+#search-input {
+    padding: 10px 15px; /* Padding for a comfortable input */
+    border-radius: 20px; /* Rounded corners */
+    border: 1px solid #ddd; /* Light border */
+    outline: none;
+    transition: border-color 0.3s ease;
+    width: 250px; /* Fixed width for the search input */
+    background-color: #fff; /* White background */
+    color: #333; /* Text color */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    font-size: 16px; /* Adjust font size */
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10%;
+    position: relative; /* Set position to relative */
+    top: 30px; /* Move it down 30 pixels */
+}
+
+
+#searchInput:focus {
+    border-color: #4caf50; /* Green border on focus */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.2); /* Green shadow on focus */
+}
+
+/* Dropdown Filter */
+#searchDropdown, #dateFilter {
+    padding: 10px 15px; /* Padding for a comfortable dropdown */
+    border-radius: 20px; /* Rounded corners */
+    border: 1px solid #ddd; /* Light border */
+    outline: none;
+    transition: border-color 0.3s ease;
+    background-color: white; /* White background for dropdown */
+    color: #333; /* Text color */
+    font-size: 16px; /* Adjust font size */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    position: relative; /* Set position to relative */
+    top: 30px; /* Move it down 30 pixels */
+}
+
+#searchDropdown:focus, #dateFilter:focus {
+    border-color: #4caf50; /* Green border on focus */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.2); /* Green shadow on focus */
+}
+
+/* Date Filter Styles */
+#filter-date {
+    padding: 10px 15px; /* Padding for a comfortable dropdown */
+    border-radius: 20px; /* Rounded corners */
+    border: 1px solid #ddd; /* Light border */
+    outline: none;
+    transition: border-color 0.3s ease;
+    background-color: white; /* White background for dropdown */
+    color: #333; /* Text color */
+    font-size: 16px; /* Adjust font size */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    width: 250px; /* Fixed width for the date filter */
+    margin-top: 10px; /* Margin for spacing */
+    margin-bottom: 10px; /* Margin for spacing */
+    margin-left: 10%; /* Margin for left alignment */
+    position: relative; /* Set position to relative */
+    top: 30px; /* Move it down 30 pixels */
+}
+
+#dateFilter:focus {
+    border-color: #4caf50; /* Green border on focus */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.2); /* Green shadow on focus */
+}
+
+/* Dark Mode Styles for Date Filter */
+body.dark-mode #dateFilter {
+    background-color: #333; /* Dark background */
+    color: #fff; /* White text color */
+    border: 1px solid #555; /* Darker border */
+}
+
+body.dark-mode #dateFilter:focus {
+    border-color: #66bb6a; /* Lighter green border on focus */
+    box-shadow: 0 0 10px rgba(102, 187, 106, 0.3); /* Lighter green shadow on focus */
+}
+
+
+/* Button styles */
+.filter-btn {
+    background-color: #4caf50; /* Primary button color */
+    color: #fff; /* White text color */
+    border: none;
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 20px; /* Rounded corners */
+    cursor: pointer;
+    font-size: 16px; /* Adjust font size */
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    outline: none;
+}
+
+.filter-btn:hover {
+    background-color: #66bb6a; /* Lighter green on hover */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); /* Larger shadow on hover */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .filter-container {
+        flex-direction: column; /* Stack filters vertically on small screens */
+        gap: 10px; /* Less space between items */
+    }
+
+    #searchInput, #searchDropdown, #dateFilter, .filter-btn {
+        width: 100%; /* Full-width on smaller screens */
+    }
+}
+
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body.dark-mode .chart {
+    background-color: #1e1e1e;
+}
+
+body.dark-mode header {
+    background-color: #1e1e1e;
+}
+
+body.dark-mode table {
+    background-color: #333;
+    color: #ffffff;
+}
+
+body.dark-mode th, body.dark-mode td {
+    border-color: #555;
+}
+
+body.dark-mode .legend-color {
+    border-color: #333;
+    color: #ffffff;
+}
+
+body.dark-mode .switch-container, body.dark-mode .export-btn {
+    background-color: #333;
+}
+
+body.dark-mode .circle-chart-content {
+    border-color: #333;
+    color: #ffffff;
+}
+
+body.dark-mode .circle-chart-content1 {
+    color: #ffffff;
+}
+
+/* Settings Panel */
+.settings-panel {
+    position: fixed;
+    bottom: 20px; /* Position the panel at the bottom of the sidebar */
+    width: 100%;
+    padding: 10px;
+}
+
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Spacing between buttons */
+}
+
+.dataTables_filter {
+    display: none;
+}
